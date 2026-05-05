@@ -214,3 +214,43 @@ export async function getLastPrice(symbol: string): Promise<LastPriceResponse | 
 export async function getSymbolInfo(symbol: string): Promise<SymbolInfoResponse | null> {
   return callApi<SymbolInfoResponse>('get_symbol_info', { symbol })
 }
+
+// Issue Submission Types
+export interface IssueSubmission {
+  user_id: number
+  symbol: string
+  name: string
+  class: string
+  is_active: boolean
+  last_price: number
+  min_qty: number
+  description: string
+  logo_url: string
+  certification: string
+  issuer: string
+  project_type: string
+  region: string
+  commissioned_year: number
+  credit_unit: string
+  total_credit: number
+  credit_per_qty: number
+  status: string
+  image_url_1?: string
+  image_url_2?: string
+  image_url_3?: string
+  image_url_4?: string
+  image_url_5?: string
+  certificate_url?: string
+  map_url?: string
+}
+
+export interface SubmitIssueResponse {
+  success: boolean
+  issue_id?: string
+  error?: string
+}
+
+export async function submitIssue(data: IssueSubmission): Promise<SubmitIssueResponse> {
+  const res = await callApi<SubmitIssueResponse>('submit_issue', data)
+  return res || { success: false, error: 'Network error' }
+}
