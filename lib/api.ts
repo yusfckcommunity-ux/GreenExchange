@@ -287,3 +287,81 @@ export async function markInboxRead(messageId: string): Promise<{ success: boole
   const res = await callApi<{ success: boolean }>('mark_inbox_read', { message_id: messageId })
   return res || { success: false }
 }
+
+// Account Management Types
+export interface CreateAccountPayload {
+  username: string
+  password: string
+  cash_balance: number
+  full_name: string
+  email: string
+  phone: string
+  avatar_url: string
+  status: string
+  kyc_status: string
+  company_name: string
+}
+
+export interface UpdateAccountPayload {
+  user_id: string
+  full_name?: string
+  email?: string
+  phone?: string
+  avatar_url?: string
+  status?: string
+  kyc_status?: string
+  company_name?: string
+}
+
+export interface GoogleLoginPayload {
+  google_id: string
+  email: string
+  full_name: string
+  avatar_url: string
+}
+
+export interface UserProfile {
+  user_id: string
+  username: string
+  full_name: string
+  email: string
+  phone: string
+  avatar_url: string
+  status: string
+  kyc_status: string
+  company_name: string
+  cash_balance: number
+  blocked_balance: number
+}
+
+export interface AccountResponse {
+  success: boolean
+  user_id?: string
+  error?: string
+}
+
+export interface ProfileResponse {
+  success: boolean
+  data?: UserProfile
+  error?: string
+}
+
+export async function createAccount(data: CreateAccountPayload): Promise<AccountResponse> {
+  const res = await callApi<AccountResponse>('create_account', data)
+  return res || { success: false, error: 'Network error' }
+}
+
+export async function updateAccount(data: UpdateAccountPayload): Promise<AccountResponse> {
+  const res = await callApi<AccountResponse>('update_account', data)
+  return res || { success: false, error: 'Network error' }
+}
+
+export async function googleLogin(data: GoogleLoginPayload): Promise<{ success: boolean; user_id?: string; is_new?: boolean }> {
+  const res = await callApi<{ success: boolean; user_id: string; is_new: boolean }>('google_login', data)
+  return res || { success: false }
+}
+
+export async function getUserProfile(userId: string): Promise<ProfileResponse> {
+  const res = await callApi<ProfileResponse>('get_user_profile', { user_id: userId })
+  return res || { success: false, error: 'Network error' }
+}

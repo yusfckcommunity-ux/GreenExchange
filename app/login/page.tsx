@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { Leaf, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -100,6 +101,22 @@ export default function LoginPage() {
           
           <p className="text-center text-muted-foreground text-sm mt-6">
             Demo credentials: user1 / pass1
+          </p>
+          
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-border" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-card px-2 text-muted-foreground">Or</span>
+            </div>
+          </div>
+          
+          <p className="text-center text-muted-foreground text-sm">
+            {"Don't have an account?"}{" "}
+            <Link href="/register" className="text-primary hover:underline">
+              Create Account
+            </Link>
           </p>
         </CardContent>
       </Card>
