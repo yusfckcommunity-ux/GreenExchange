@@ -6,6 +6,7 @@ import useSWR from "swr"
 import { Button } from "@/components/ui/button"
 import { useAuthStore } from "@/lib/auth-store"
 import { getAccount } from "@/lib/api"
+import { InboxButton } from "./inbox"
 
 export function DashboardHeader() {
   const router = useRouter()
@@ -55,6 +56,8 @@ export function DashboardHeader() {
             </div>
           )}
         </div>
+
+        <InboxButton />
 
         <Button
           variant="ghost"

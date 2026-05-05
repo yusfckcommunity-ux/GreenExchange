@@ -254,3 +254,36 @@ export async function submitIssue(data: IssueSubmission): Promise<SubmitIssueRes
   const res = await callApi<SubmitIssueResponse>('submit_issue', data)
   return res || { success: false, error: 'Network error' }
 }
+
+// Inbox Types
+export type InboxCategory = 
+  | 'warning'
+  | 'order_notification'
+  | 'system_notification'
+  | 'cancelation'
+  | 'direct_message'
+  | 'others'
+
+export interface InboxMessage {
+  message_id: string
+  category: InboxCategory
+  subject: string
+  message: string
+  time: string
+  is_read: number
+}
+
+export interface InboxResponse {
+  success: boolean
+  data: InboxMessage[]
+}
+
+export async function getInbox(userId: string): Promise<InboxResponse> {
+  const res = await callApi<InboxResponse>('get_inbox', { user_id: userId })
+  return res || { success: false, data: [] }
+}
+
+export async function markInboxRead(messageId: string): Promise<{ success: boolean }> {
+  const res = await callApi<{ success: boolean }>('mark_inbox_read', { message_id: messageId })
+  return res || { success: false }
+}
