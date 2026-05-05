@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { TrendingUp, Briefcase, ClipboardList, PlusCircle, Settings } from "lucide-react"
+import { TrendingUp, Briefcase, ClipboardList, PlusCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const navItems = [
@@ -10,7 +10,6 @@ const navItems = [
   { href: "/dashboard/portfolio", label: "Portfolio", icon: Briefcase },
   { href: "/dashboard/orders", label: "Orders", icon: ClipboardList },
   { href: "/dashboard/register", label: "Register", icon: PlusCircle },
-  { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ]
 
 export function DashboardNav() {

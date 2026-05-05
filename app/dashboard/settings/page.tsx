@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 import { Loader2, User, Mail, Phone, Building2, Shield, Camera, CheckCircle2, AlertCircle } from "lucide-react"
-import useSWR from "swr"
+import useSWR, { preload } from "swr"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -12,13 +13,27 @@ import { Badge } from "@/components/ui/badge"
 import { getUserProfile, updateAccount, type UserProfile } from "@/lib/api"
 import { useAuthStore } from "@/lib/auth-store"
 
+// Preload profile data fetcher
+const profileFetcher = (key: [string, string]) => getUserProfile(key[1])
+
 export default function SettingsPage() {
   const router = useRouter()
   const { userId, isAuthenticated } = useAuthStore()
   
+  // Preload data on component mount
+  useEffect(() => {
+    if (userId) {
+      preload(['profile', userId], profileFetcher)
+    }
+  }, [userId])
+  
   const { data: profileData, isLoading: isProfileLoading, mutate } = useSWR(
     userId ? ['profile', userId] : null,
-    () => getUserProfile(userId!)
+    profileFetcher,
+    { 
+      revalidateOnFocus: false,
+      dedupingInterval: 5000
+    }
   )
   
   const profile = profileData?.data
@@ -34,6 +49,7 @@ export default function SettingsPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
+  const [isInitialized, setIsInitialized] = useState(false)
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -42,7 +58,7 @@ export default function SettingsPage() {
   }, [isAuthenticated, router])
 
   useEffect(() => {
-    if (profile) {
+    if (profile && !isInitialized) {
       setFormData({
         full_name: profile.full_name || "",
         email: profile.email || "",
@@ -50,8 +66,9 @@ export default function SettingsPage() {
         company_name: profile.company_name || "",
         avatar_url: profile.avatar_url || "",
       })
+      setIsInitialized(true)
     }
-  }, [profile])
+  }, [profile, isInitialized])
 
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -135,12 +152,14 @@ export default function SettingsPage() {
           <CardContent className="pt-6">
             <div className="flex flex-col items-center text-center">
               <div className="relative">
-                <div className="w-24 h-24 rounded-full bg-secondary flex items-center justify-center overflow-hidden">
+                <div className="w-24 h-24 rounded-full bg-secondary flex items-center justify-center overflow-hidden relative">
                   {formData.avatar_url ? (
-                    <img 
+                    <Image 
                       src={formData.avatar_url} 
                       alt="Avatar" 
-                      className="w-full h-full object-cover"
+                      fill
+                      className="object-cover"
+                      unoptimized
                     />
                   ) : (
                     <User className="h-12 w-12 text-muted-foreground" />

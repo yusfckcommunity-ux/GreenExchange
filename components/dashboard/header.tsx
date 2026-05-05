@@ -1,6 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 import { Leaf, LogOut, Wallet, User, Settings, ChevronDown } from "lucide-react"
 import useSWR from "swr"
 import { Button } from "@/components/ui/button"
@@ -80,12 +81,14 @@ export function DashboardHeader() {
               variant="ghost" 
               className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
             >
-              <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center overflow-hidden">
+              <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center overflow-hidden relative">
                 {profile?.avatar_url ? (
-                  <img 
+                  <Image 
                     src={profile.avatar_url} 
                     alt="Avatar" 
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
+                    unoptimized
                   />
                 ) : (
                   <User className="h-4 w-4" />

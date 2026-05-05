@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import Image from "next/image"
 import { Leaf, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,6 +11,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { FieldGroup, Field, FieldLabel } from "@/components/ui/field"
 import { login } from "@/lib/api"
 import { useAuthStore } from "@/lib/auth-store"
+
+const BACKGROUND_IMAGE = "https://static.independent.co.uk/2022/04/06/10/solar%20panel%20night%20electricity.jpg?width=1200&height=800&crop=1200:800"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -37,8 +40,24 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-card border-border">
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background Image */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src={BACKGROUND_IMAGE}
+          alt="Solar panels at night"
+          fill
+          className="object-cover"
+          priority
+          unoptimized
+        />
+        {/* Dark blur overlay */}
+        <div className="absolute inset-0 bg-background/80 backdrop-blur-md" />
+        {/* Gradient overlay for depth */}
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/50" />
+      </div>
+      
+      <Card className="w-full max-w-md bg-card/95 border-border backdrop-blur-sm relative z-10 shadow-2xl">
         <CardHeader className="text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
             <div className="p-2 rounded-lg bg-primary/10">
