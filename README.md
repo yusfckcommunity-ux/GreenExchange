@@ -1,5 +1,5 @@
-# GREENEXCHANGE
-![Uploading image.png…]()
+<img width="1254" height="1254" alt="image" src="https://github.com/user-attachments/assets/6f377f7e-57fa-44ed-b594-f18780a1f41f" /># GREENEXCHANGE
+
 ## Open Environmental Asset Marketplace
 
 Platform perdagangan digital untuk Renewable Energy Certificate (REC) dan Carbon Credit berbasis mekanisme market exchange terbuka.
