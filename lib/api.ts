@@ -214,3 +214,154 @@ export async function getLastPrice(symbol: string): Promise<LastPriceResponse | 
 export async function getSymbolInfo(symbol: string): Promise<SymbolInfoResponse | null> {
   return callApi<SymbolInfoResponse>('get_symbol_info', { symbol })
 }
+
+// Issue Submission Types
+export interface IssueSubmission {
+  user_id: number
+  symbol: string
+  name: string
+  class: string
+  is_active: boolean
+  last_price: number
+  min_qty: number
+  description: string
+  logo_url: string
+  certification: string
+  issuer: string
+  project_type: string
+  region: string
+  commissioned_year: number
+  credit_unit: string
+  total_credit: number
+  credit_per_qty: number
+  status: string
+  image_url_1?: string
+  image_url_2?: string
+  image_url_3?: string
+  image_url_4?: string
+  image_url_5?: string
+  certificate_url?: string
+  map_url?: string
+}
+
+export interface SubmitIssueResponse {
+  success: boolean
+  issue_id?: string
+  error?: string
+}
+
+export async function submitIssue(data: IssueSubmission): Promise<SubmitIssueResponse> {
+  const res = await callApi<SubmitIssueResponse>('submit_issue', data)
+  return res || { success: false, error: 'Network error' }
+}
+
+// Inbox Types
+export type InboxCategory = 
+  | 'warning'
+  | 'order_notification'
+  | 'system_notification'
+  | 'cancelation'
+  | 'direct_message'
+  | 'others'
+
+export interface InboxMessage {
+  message_id: string
+  category: InboxCategory
+  subject: string
+  message: string
+  time: string
+  is_read: number
+}
+
+export interface InboxResponse {
+  success: boolean
+  data: InboxMessage[]
+}
+
+export async function getInbox(userId: string): Promise<InboxResponse> {
+  const res = await callApi<InboxResponse>('get_inbox', { user_id: userId })
+  return res || { success: false, data: [] }
+}
+
+export async function markInboxRead(messageId: string): Promise<{ success: boolean }> {
+  const res = await callApi<{ success: boolean }>('mark_inbox_read', { message_id: messageId })
+  return res || { success: false }
+}
+
+// Account Management Types
+export interface CreateAccountPayload {
+  username: string
+  password: string
+  cash_balance: number
+  full_name: string
+  email: string
+  phone: string
+  avatar_url: string
+  status: string
+  kyc_status: string
+  company_name: string
+}
+
+export interface UpdateAccountPayload {
+  user_id: string
+  full_name?: string
+  email?: string
+  phone?: string
+  avatar_url?: string
+  status?: string
+  kyc_status?: string
+  company_name?: string
+}
+
+export interface GoogleLoginPayload {
+  google_id: string
+  email: string
+  full_name: string
+  avatar_url: string
+}
+
+export interface UserProfile {
+  user_id: string
+  username: string
+  full_name: string
+  email: string
+  phone: string
+  avatar_url: string
+  status: string
+  kyc_status: string
+  company_name: string
+  cash_balance: number
+  blocked_balance: number
+}
+
+export interface AccountResponse {
+  success: boolean
+  user_id?: string
+  error?: string
+}
+
+export interface ProfileResponse {
+  success: boolean
+  data?: UserProfile
+  error?: string
+}
+
+export async function createAccount(data: CreateAccountPayload): Promise<AccountResponse> {
+  const res = await callApi<AccountResponse>('create_account', data)
+  return res || { success: false, error: 'Network error' }
+}
+
+export async function updateAccount(data: UpdateAccountPayload): Promise<AccountResponse> {
+  const res = await callApi<AccountResponse>('update_account', data)
+  return res || { success: false, error: 'Network error' }
+}
+
+export async function googleLogin(data: GoogleLoginPayload): Promise<{ success: boolean; user_id?: string; is_new?: boolean }> {
+  const res = await callApi<{ success: boolean; user_id: string; is_new: boolean }>('google_login', data)
+  return res || { success: false }
+}
+
+export async function getUserProfile(userId: string): Promise<ProfileResponse> {
+  const res = await callApi<ProfileResponse>('get_user_profile', { user_id: userId })
+  return res || { success: false, error: 'Network error' }
+}

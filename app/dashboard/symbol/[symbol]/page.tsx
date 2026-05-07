@@ -117,8 +117,7 @@ export default function SymbolPage({ params }: SymbolPageProps) {
                     {info.status}
                   </Badge>
                 </div>
-                <h2 className="text-xl text-muted-foreground mb-4">{info.name}</h2>
-                <p className="text-muted-foreground max-w-2xl text-justify">{info.description}</p>
+                <h2 className="text-xl text-muted-foreground">{info.name}</h2>
               </div>
 
               {/* Price Card */}
@@ -139,6 +138,16 @@ export default function SymbolPage({ params }: SymbolPageProps) {
             </div>
           </CardContent>
         </div>
+      </Card>
+
+      {/* Description Section */}
+      <Card className="bg-card border-border">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg text-foreground">About This Project</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground leading-relaxed text-justify">{info.description}</p>
+        </CardContent>
       </Card>
 
       {/* Details Grid */}

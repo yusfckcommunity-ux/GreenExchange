@@ -2,13 +2,17 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Leaf, Loader2 } from "lucide-react"
+import Link from "next/link"
+import Image from "next/image"
+import { Leaf, Loader2, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { FieldGroup, Field, FieldLabel } from "@/components/ui/field"
 import { login } from "@/lib/api"
 import { useAuthStore } from "@/lib/auth-store"
+
+const BACKGROUND_IMAGE = "https://static.independent.co.uk/2022/04/06/10/solar%20panel%20night%20electricity.jpg?width=1200&height=800&crop=1200:800"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -36,8 +40,35 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-card border-border">
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Back Button */}
+      <Link 
+        href="/" 
+        className="absolute top-4 left-4 z-20 p-2 rounded-lg hover:bg-background/20 transition-colors"
+      >
+        <Button variant="ghost" size="icon" className="text-primary-foreground hover:text-foreground">
+          <ArrowLeft className="h-5 w-5" />
+          <span className="sr-only">Back to About</span>
+        </Button>
+      </Link>
+
+      {/* Background Image */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src={BACKGROUND_IMAGE}
+          alt="Solar panels at night"
+          fill
+          className="object-cover"
+          priority
+          unoptimized
+        />
+        {/* Dark blur overlay */}
+        <div className="absolute inset-0 bg-background/80 backdrop-blur-md" />
+        {/* Gradient overlay for depth */}
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/50" />
+      </div>
+      
+      <Card className="w-full max-w-md bg-card/95 border-border backdrop-blur-sm relative z-10 shadow-2xl">
         <CardHeader className="text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
             <div className="p-2 rounded-lg bg-primary/10">
@@ -100,6 +131,22 @@ export default function LoginPage() {
           
           <p className="text-center text-muted-foreground text-sm mt-6">
             Demo credentials: user1 / pass1
+          </p>
+          
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-border" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-card px-2 text-muted-foreground">Or</span>
+            </div>
+          </div>
+          
+          <p className="text-center text-muted-foreground text-sm">
+            {"Don't have an account?"}{" "}
+            <Link href="/register" className="text-primary hover:underline">
+              Create Account
+            </Link>
           </p>
         </CardContent>
       </Card>

@@ -1,11 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import { Loader2 } from "lucide-react"
+import { Loader2, AlertTriangle, Info, Leaf, Zap } from "lucide-react"
+import useSWR from "swr"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { FieldGroup, Field, FieldLabel } from "@/components/ui/field"
-import { placeBuyOrder, placeSellOrder, type Symbol, type TradeContext } from "@/lib/api"
+import { placeBuyOrder, placeSellOrder, getSymbolInfo, getAccount, type Symbol, type TradeContext } from "@/lib/api"
 import { useAuthStore } from "@/lib/auth-store"
 import { cn } from "@/lib/utils"
 
@@ -24,6 +25,21 @@ export function TradeForm({ symbol, side, tradeContext, onOrderPlaced }: TradeFo
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
 
+  // Fetch symbol info for credit details
+  const { data: symbolInfo } = useSWR(
+    ['symbolInfo', symbol.symbol],
+    () => getSymbolInfo(symbol.symbol)
+  )
+
+  // Fetch account for balance
+  const { data: account } = useSWR(
+    userId ? ['account', userId] : null,
+    () => getAccount(userId!)
+  )
+
+  const info = symbolInfo?.data
+  const cashBalance = account?.cash_balance || 0
+
   const formatPrice = (value: number) => {
     return new Intl.NumberFormat('id-ID').format(value)
   }
@@ -33,6 +49,21 @@ export function TradeForm({ symbol, side, tradeContext, onOrderPlaced }: TradeFo
     const q = parseFloat(quantity) || 0
     return p * q
   }
+
+  const estimatedRemainingBalance = () => {
+    if (side === "buy") {
+      return cashBalance - estimatedTotal()
+    }
+    return cashBalance
+  }
+
+  const estimatedCredit = () => {
+    const q = parseFloat(quantity) || 0
+    const creditPerQty = info?.credit_per_qty || 0
+    return q * creditPerQty
+  }
+
+  const isInsufficientBalance = side === "buy" && estimatedTotal() > cashBalance
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -135,15 +166,85 @@ export function TradeForm({ symbol, side, tradeContext, onOrderPlaced }: TradeFo
         </Field>
       </FieldGroup>
 
-      {/* Estimated total */}
-      <div className="mt-4 p-3 rounded-lg bg-secondary/50">
+      {/* Credit Info Summary */}
+      {info && (
+        <div className="mt-4 p-3 rounded-lg bg-primary/5 border border-primary/20">
+          <div className="flex items-center gap-2 mb-2">
+            {info.class === 'REC' ? (
+              <Zap className="h-4 w-4 text-primary" />
+            ) : (
+              <Leaf className="h-4 w-4 text-primary" />
+            )}
+            <span className="text-sm font-medium text-foreground">Credit Details</span>
+          </div>
+          <div className="space-y-1 text-xs">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Type:</span>
+              <span className="text-foreground">{info.class} - {info.certification}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Credit Unit:</span>
+              <span className="text-foreground">{info.credit_unit}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Credit per Qty:</span>
+              <span className="font-mono text-foreground">{info.credit_per_qty}</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Estimated total and balance */}
+      <div className="mt-4 p-3 rounded-lg bg-secondary/50 space-y-2">
         <div className="flex justify-between text-sm">
           <span className="text-muted-foreground">Estimated Total:</span>
           <span className="font-mono font-semibold text-foreground">
             {formatPrice(estimatedTotal())}
           </span>
         </div>
+        
+        {/* Estimated Credit */}
+        {info && parseFloat(quantity) > 0 && (
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">Est. Credit {side === "buy" ? "Received" : "Listed"}:</span>
+            <span className="font-mono text-primary">
+              {formatPrice(estimatedCredit())} {info.credit_unit}
+            </span>
+          </div>
+        )}
+
+        {/* Balance Info for Buy */}
+        {side === "buy" && (
+          <>
+            <div className="flex justify-between text-sm pt-2 border-t border-border">
+              <span className="text-muted-foreground">Current Balance:</span>
+              <span className="font-mono text-foreground">{formatPrice(cashBalance)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Est. Remaining:</span>
+              <span className={cn(
+                "font-mono",
+                estimatedRemainingBalance() < 0 ? "text-destructive" : "text-foreground"
+              )}>
+                {formatPrice(estimatedRemainingBalance())}
+              </span>
+            </div>
+          </>
+        )}
       </div>
+
+      {/* Insufficient Balance Warning */}
+      {isInsufficientBalance && estimatedTotal() > 0 && (
+        <div className="mt-3 p-3 rounded-lg bg-destructive/10 border border-destructive/30 flex items-start gap-2">
+          <AlertTriangle className="h-4 w-4 text-destructive flex-shrink-0 mt-0.5" />
+          <div className="text-sm">
+            <p className="font-medium text-destructive">Insufficient Balance</p>
+            <p className="text-destructive/80 text-xs mt-0.5">
+              You need {formatPrice(estimatedTotal() - cashBalance)} more to complete this order.
+            </p>
+          </div>
+        </div>
+      )}
 
       {error && (
         <p className="mt-3 text-sm text-destructive">{error}</p>
@@ -155,7 +256,7 @@ export function TradeForm({ symbol, side, tradeContext, onOrderPlaced }: TradeFo
 
       <Button
         type="submit"
-        disabled={isLoading}
+        disabled={isLoading || (side === "buy" && isInsufficientBalance && estimatedTotal() > 0)}
         className={cn(
           "w-full mt-4 font-semibold",
           side === "buy"

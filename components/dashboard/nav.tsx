@@ -2,13 +2,14 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, TrendingUp, Briefcase, ClipboardList } from "lucide-react"
+import { TrendingUp, Briefcase, ClipboardList, PlusCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const navItems = [
   { href: "/dashboard", label: "Market", icon: TrendingUp },
   { href: "/dashboard/portfolio", label: "Portfolio", icon: Briefcase },
   { href: "/dashboard/orders", label: "Orders", icon: ClipboardList },
+  { href: "/dashboard/register", label: "Register", icon: PlusCircle },
 ]
 
 export function DashboardNav() {
