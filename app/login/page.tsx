@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
-import { Leaf, Loader2 } from "lucide-react"
+import { Leaf, Loader2, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -41,6 +41,17 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Back Button */}
+      <Link 
+        href="/" 
+        className="absolute top-4 left-4 z-20 p-2 rounded-lg hover:bg-background/20 transition-colors"
+      >
+        <Button variant="ghost" size="icon" className="text-primary-foreground hover:text-foreground">
+          <ArrowLeft className="h-5 w-5" />
+          <span className="sr-only">Back to About</span>
+        </Button>
+      </Link>
+
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image
