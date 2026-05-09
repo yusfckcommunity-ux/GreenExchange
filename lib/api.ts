@@ -365,3 +365,83 @@ export async function getUserProfile(userId: string): Promise<ProfileResponse> {
   const res = await callApi<ProfileResponse>('get_user_profile', { user_id: userId })
   return res || { success: false, error: 'Network error' }
 }
+
+// FYP/Homepage Types
+export interface TrendingSymbol {
+  symbol: string
+  name: string
+  class: string
+  last_price: number
+  logo_url: string
+  certification: string
+  issuer: string
+}
+
+export interface News {
+  news_id: string
+  news_url: string
+  news_title: string
+  news_abstract: string
+  news_thumbnail_url: string
+}
+
+export interface ForumMessage {
+  user_id: string
+  chat_topic: string
+  chat_body: string
+  time: string
+  username?: string
+  avatar_url?: string
+}
+
+export interface FYPResponse {
+  success: boolean
+  trending_symbols: TrendingSymbol[]
+  news: News[]
+  forum: ForumMessage[]
+}
+
+export interface ForumResponse {
+  success: boolean
+  data: ForumMessage[]
+}
+
+export interface CertificateInfo {
+  certificate_id: string
+  certificate_name: string
+  certificate_publisher: string
+  certificate_loc: string
+  certificate_logo_url: string
+  certificate_type: string
+  certificate_year: string
+  certificate_desc_about: string
+}
+
+export interface CertificateResponse {
+  success: boolean
+  data?: CertificateInfo
+}
+
+export async function getFYP(): Promise<FYPResponse> {
+  const res = await callApi<FYPResponse>('get_fyp')
+  return res || { success: false, trending_symbols: [], news: [], forum: [] }
+}
+
+export async function getForum(): Promise<ForumResponse> {
+  const res = await callApi<ForumResponse>('get_forum')
+  return res || { success: false, data: [] }
+}
+
+export async function postForum(userId: string, chatTopic: string, chatBody: string): Promise<{ success: boolean }> {
+  const res = await callApi<{ success: boolean }>('post_forum', {
+    user_id: userId,
+    chat_topic: chatTopic,
+    chat_body: chatBody,
+  })
+  return res || { success: false }
+}
+
+export async function getCertificateInfo(certificateName: string): Promise<CertificateResponse> {
+  const res = await callApi<CertificateResponse>('get_certificate_info', { certificate_name: certificateName })
+  return res || { success: false }
+}
